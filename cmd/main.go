@@ -10,8 +10,8 @@ func main() {
 	albumUsecase := usecase.NewAlbumUsecase()
 	cardScraper := usecase.NewCardScraper()
 
-
-	cardUsecase := usecase.NewCardUsecase(*repository.NewCardCSVRepository("cards.csv"))
+	cardRepo := repository.NewCardCSVRepository("cards.csv")
+	cardUsecase := usecase.NewCardUsecase(cardRepo)
 
 	handler := adapters.NewHandler(albumUsecase, cardScraper, cardUsecase)
 	router := adapters.SetupRouter(handler)
