@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"github.com/miguelnatantomaz/card-validator-go-rest/internal/core/domain"
+	"github.com/miguelnatantomaz/card-validator-go-rest/internal/core/validator"
 	"github.com/miguelnatantomaz/card-validator-go-rest/internal/infra/repository"
 )
 type CardUsecase struct{
@@ -14,4 +15,8 @@ func NewCardUsecase(repo repository.CardCSVRepository) *CardUsecase {
 
 func (cs *CardUsecase) GetCardByNumber(number string) (*domain.Card, error) {
 	return cs.repo.GetByNumber(number)
+}
+
+func (u *CardUsecase) ValidateCard(number string) bool {
+	return validator.ValidateCard(number)
 }

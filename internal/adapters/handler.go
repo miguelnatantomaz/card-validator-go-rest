@@ -79,3 +79,13 @@ func (h *Handler) GetCardByNumber(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, card)
 }
+
+func (h *Handler) ValidateCard(c *gin.Context) {
+	number := c.Param("number")
+	isValid := h.cardUseCase.ValidateCard(number)
+
+	c.JSON(http.StatusOK, gin.H{
+		"number": number,
+		"valid": isValid,
+	})
+}
