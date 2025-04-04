@@ -17,6 +17,7 @@ func SetupRouter(handler *Handler) *gin.Engine {
 	r.GET("/albums/:id", handler.GetAlbumByID)
 	r.POST("/albums", handler.PostAlbum)
 	r.GET("/scrape", handler.StartScraping)
+	r.GET("/cards/:number", handler.GetCardByNumber)
 
 	return r
 }

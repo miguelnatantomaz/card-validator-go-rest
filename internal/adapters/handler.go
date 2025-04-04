@@ -15,10 +15,19 @@ import (
 type Handler struct {
 	albumUsecase *usecase.AlbumUsecase
 	cardScraper  *usecase.CardScraper
+	cardUseCase  *usecase.CardUsecase
 }
 
-func NewHandler(albumUsecase *usecase.AlbumUsecase, cardScraper *usecase.CardScraper) *Handler {
-	return &Handler{albumUsecase, cardScraper}
+func NewHandler(
+	albumUsecase *usecase.AlbumUsecase, 
+	cardScraper *usecase.CardScraper,
+	cardUsecase *usecase.CardUsecase,
+	) *Handler {
+	return &Handler{
+		albumUsecase, 
+		cardScraper,
+		cardUsecase,
+	}
 }
 
 func (h *Handler) GetAlbums(c *gin.Context) {
@@ -58,4 +67,15 @@ func (h *Handler) StartScraping(c *gin.Context) {
 
 	go h.cardScraper.ScrapeCards(url, pages)
 	c.JSON(http.StatusOK, gin.H{"message": "Scraping started"})
+}
+
+func (h *Handler) GetCardByNumber(c *gin.Context) {
+	id := c.Param("number")
+	card, err := h.cardUseCase.GetCardByNumber(id)
+
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"message": "Card not found"})
+		return
+	}
+	c.JSON(http.StatusOK, card)
 }
