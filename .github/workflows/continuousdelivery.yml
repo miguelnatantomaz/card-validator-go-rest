@@ -5,7 +5,7 @@ on:
       - main
 
 jobs:
-  build:
+  deliver:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
@@ -14,9 +14,18 @@ jobs:
       - name: Continuous delivery
         uses: actions/upload-artifact@v4
         with:
-          name: card-validator-go-rest.zip
+          name: card-validator-go-rest
           path: |
             '**.go'
             go.mod
             go.sum
             README.md
+  deploy: 
+    runs-on: ubuntu-latest
+    needs: deliver
+    steps: 
+      - uses: actions/download-artifact@v4
+        with:
+          name: card-validator-go-rest
+      - name: Display structure of downloaded files
+        run: ls -R
