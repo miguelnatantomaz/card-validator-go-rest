@@ -1,0 +1,22 @@
+name: Continuous Delivery
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Continuous delivery
+        uses: actions/upload-artifact@v4
+        with:
+          name: card-validator-go-rest.zip
+          path: |
+            '**.go'
+            go.mod
+            go.sum
+            README.md
