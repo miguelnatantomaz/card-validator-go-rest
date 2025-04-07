@@ -1,0 +1,17 @@
+name: Continuous Integration
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+on: 
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+      
+      - name: Golang Action
+        uses: cedrickring/golang-action/go1.24.2@1.7.0
+      - name: Golangci-lint
+        uses: golangci/golangci-lint-action@v7.0.0
