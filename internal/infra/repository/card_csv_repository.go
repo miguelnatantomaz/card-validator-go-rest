@@ -22,7 +22,12 @@ func (r *CardCSVRepository) GetByNumber(number string) (*domain.Card, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer file.Close()
+	defer func() {
+			closeErr := file.Close()
+			if err == nil {
+					err = closeErr
+			}
+	}()
 
 	reader := csv.NewReader(file)
 	records, err := reader.ReadAll()
@@ -35,7 +40,7 @@ func (r *CardCSVRepository) GetByNumber(number string) (*domain.Card, error) {
 			continue
 		}
 		
-		if strings.Contains(number, row[0]) {
+		if strings.HasPrefix(number, row[0]) {
 			card := &domain.Card{
 				Number:  row[0],
 				Name:    row[1],

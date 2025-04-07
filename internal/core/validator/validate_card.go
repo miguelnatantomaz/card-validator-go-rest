@@ -2,7 +2,7 @@ package validator
 
 func ValidateCard(number string) bool {
 	var sum int
-	var alternate bool = false
+	var alternate = false
 
 	for i := len(number) - 1; i>= 0; i-- {
 		digit := int(number[i] - '0')
