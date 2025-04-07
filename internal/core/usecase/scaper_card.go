@@ -25,10 +25,16 @@ func (cs *CardScraper) ScrapeCards(url string, pageSize int) {
 		colly.Async(true),
 	)
 
-	c.Limit(&colly.LimitRule{
+	err := c.Limit(&colly.LimitRule{
+		DomainGlob:  "*",
 		Delay:       2 * time.Second,
 		RandomDelay: 1 * time.Second,
 	})
+
+	if err != nil {
+		log.Printf("Erro ao limitar colly: %v", err)
+		return
+	}
 
 	c.OnRequest(func(r *colly.Request) {
 		r.Headers.Set("User-Agent", "Mozilla/5.0")
@@ -52,13 +58,25 @@ func (cs *CardScraper) ScrapeCards(url string, pageSize int) {
 		if err != nil {
 			log.Fatalln("Failed to create output CSV file", err)
 		}
-		defer file.Close()
+		defer func() {
+				closeErr := file.Close()
+				if err == nil {
+						err = closeErr
+				}
+		}()
 
 		writer := csv.NewWriter(file)
-		writer.Write([]string{"Number", "Name", "Type", "Level", "Country"})
+		err = writer.Write([]string{"Number", "Name", "Type", "Level", "Country"})
+		if err != nil {
+			log.Printf("falha ao inicia writer: %v", err)
+				return
+		}
 
 		for _, card := range cards {
-			writer.Write([]string{card.Number, card.Name, card.Type, card.Level, card.Country})
+			err := writer.Write([]string{card.Number, card.Name, card.Type, card.Level, card.Country})
+			if err != nil {
+				log.Printf("falha ao escrever no CSV: %v", err)
+			}
 		}
 
 		writer.Flush()
