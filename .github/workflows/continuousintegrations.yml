@@ -10,7 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
-      
+        uses: actions/checkout@v4
+
       - name: Golang Action
         uses: cedrickring/golang-action/go1.24.2@1.7.0
       - name: Golangci-lint
