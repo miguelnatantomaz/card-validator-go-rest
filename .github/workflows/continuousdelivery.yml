@@ -16,7 +16,7 @@ jobs:
         with:
           name: card-validator-go-rest
           path: |
-            '**.go'
+            **.go
             go.mod
             go.sum
             README.md
