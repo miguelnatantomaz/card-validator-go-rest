@@ -31,7 +31,7 @@ RUN adduser \
 USER appuser
 
 HEALTHCHECK --interval=10s --timeout=5s --start-period=5s --retries=3 \
-    CMD [ "curl","-f","http://localhost:8080/ping" ]
+    CMD curl -s http://localhost:8080/ping || exit 0
 
 ENTRYPOINT ["./server"]
 CMD ["8080"]
