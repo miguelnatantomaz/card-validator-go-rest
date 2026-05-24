@@ -1,12 +1,11 @@
-package usecase_test
+package card_test
 
 import (
 	"errors"
+	"testing"
 
 	"github.com/miguelnatantomaz/card-validator-go-rest/internal/core/domain"
-	"github.com/miguelnatantomaz/card-validator-go-rest/internal/core/usecase"
-
-	"testing"
+	"github.com/miguelnatantomaz/card-validator-go-rest/internal/core/usecase/card"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -18,15 +17,15 @@ type MockCardRepository struct {
 
 func (m *MockCardRepository) GetByNumber(number string) (*domain.Card, error) {
 	args := m.Called(number)
-	if card, ok := args.Get(0).(*domain.Card); ok {
-		return card, args.Error(1)
+	if c, ok := args.Get(0).(*domain.Card); ok {
+		return c, args.Error(1)
 	}
 	return nil, args.Error(1)
 }
 
 func TestValidateCard_Valid(t *testing.T) {
 	repo := new(MockCardRepository)
-	uc := usecase.NewCardUsecase(repo)
+	uc := card.NewCardUsecase(repo)
 
 	validCard := "4539578763621486"
 
@@ -37,7 +36,7 @@ func TestValidateCard_Valid(t *testing.T) {
 
 func TestValidateCard_Invalid(t *testing.T) {
 	repo := new(MockCardRepository)
-	uc := usecase.NewCardUsecase(repo)
+	uc := card.NewCardUsecase(repo)
 
 	invalidCard := "1234567890123456"
 
@@ -48,8 +47,8 @@ func TestValidateCard_Invalid(t *testing.T) {
 
 func TestGetCardByNumber_Success(t *testing.T) {
 	repo := new(MockCardRepository)
-	uc := usecase.NewCardUsecase(repo)
-	
+	uc := card.NewCardUsecase(repo)
+
 	expectedCard := &domain.Card{
 		Number:  "4539578763621486",
 		Name:    "Visa",
@@ -57,43 +56,43 @@ func TestGetCardByNumber_Success(t *testing.T) {
 		Level:   "Gold",
 		Country: "US",
 	}
-	
+
 	repo.On("GetByNumber", "4539578763621486").Return(expectedCard, nil)
-	
-	card, err := uc.GetCardByNumber("4539578763621486")
-	
+
+	result, err := uc.GetCardByNumber("4539578763621486")
+
 	assert.NoError(t, err)
-	assert.NotNil(t, card)
-	assert.Equal(t, expectedCard, card)
+	assert.NotNil(t, result)
+	assert.Equal(t, expectedCard, result)
 	repo.AssertExpectations(t)
 }
 
 func TestGetCardByNumber_NotFound(t *testing.T) {
 	repo := new(MockCardRepository)
-	uc := usecase.NewCardUsecase(repo)
-	
+	uc := card.NewCardUsecase(repo)
+
 	expectedErr := errors.New("card not found")
 	repo.On("GetByNumber", "1234567890123456").Return(nil, expectedErr)
-	
-	card, err := uc.GetCardByNumber("1234567890123456")
-	
+
+	result, err := uc.GetCardByNumber("1234567890123456")
+
 	assert.Error(t, err)
-	assert.Nil(t, card)
+	assert.Nil(t, result)
 	assert.Equal(t, expectedErr, err)
 	repo.AssertExpectations(t)
 }
 
 func TestGetCardByNumber_RepositoryError(t *testing.T) {
 	repo := new(MockCardRepository)
-	uc := usecase.NewCardUsecase(repo)
-	
-	expectedErr := errors.New("csv not foud")
+	uc := card.NewCardUsecase(repo)
+
+	expectedErr := errors.New("csv not found")
 	repo.On("GetByNumber", "4539578763621486").Return(nil, expectedErr)
-	
-	card, err := uc.GetCardByNumber("4539578763621486")
-	
+
+	result, err := uc.GetCardByNumber("4539578763621486")
+
 	assert.Error(t, err)
-	assert.Nil(t, card)
+	assert.Nil(t, result)
 	assert.Equal(t, expectedErr, err)
 	repo.AssertExpectations(t)
 }

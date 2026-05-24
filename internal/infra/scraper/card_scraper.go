@@ -1,4 +1,4 @@
-package usecase
+package scraper
 
 import (
 	"encoding/csv"
@@ -59,17 +59,17 @@ func (cs *CardScraper) ScrapeCards(url string, pageSize int) {
 			log.Fatalln("Failed to create output CSV file", err)
 		}
 		defer func() {
-				closeErr := file.Close()
-				if err == nil {
-						err = closeErr
-				}
+			closeErr := file.Close()
+			if err == nil {
+				err = closeErr
+			}
 		}()
 
 		writer := csv.NewWriter(file)
 		err = writer.Write([]string{"Number", "Name", "Type", "Level", "Country"})
 		if err != nil {
 			log.Printf("falha ao inicia writer: %v", err)
-				return
+			return
 		}
 
 		for _, card := range cards {

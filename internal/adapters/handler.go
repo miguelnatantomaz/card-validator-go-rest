@@ -7,24 +7,38 @@ import (
 	"strconv"
 
 	"github.com/miguelnatantomaz/card-validator-go-rest/internal/core/domain"
-	"github.com/miguelnatantomaz/card-validator-go-rest/internal/core/usecase"
 
 	"github.com/gin-gonic/gin"
 )
 
+type AlbumUsecaseI interface {
+	GetAllAlbums() []domain.Album
+	GetAlbumByID(id string) *domain.Album
+	AddAlbum(album domain.Album)
+}
+
+type CardScraperI interface {
+	ScrapeCards(url string, pageSize int)
+}
+
+type CardUsecaseI interface {
+	GetCardByNumber(number string) (*domain.Card, error)
+	ValidateCard(number string) bool
+}
+
 type Handler struct {
-	albumUsecase *usecase.AlbumUsecase
-	cardScraper  *usecase.CardScraper
-	cardUseCase  *usecase.CardUsecase
+	albumUsecase AlbumUsecaseI
+	cardScraper  CardScraperI
+	cardUseCase  CardUsecaseI
 }
 
 func NewHandler(
-	albumUsecase *usecase.AlbumUsecase, 
-	cardScraper *usecase.CardScraper,
-	cardUsecase *usecase.CardUsecase,
-	) *Handler {
+	albumUsecase AlbumUsecaseI,
+	cardScraper CardScraperI,
+	cardUsecase CardUsecaseI,
+) *Handler {
 	return &Handler{
-		albumUsecase, 
+		albumUsecase,
 		cardScraper,
 		cardUsecase,
 	}
@@ -54,16 +68,19 @@ func (h *Handler) PostAlbum(c *gin.Context) {
 	c.JSON(http.StatusCreated, newAlbum)
 }
 
-
 func (h *Handler) StartScraping(c *gin.Context) {
 	url := os.Getenv("SCRAPER_URL")
 	pagesStr := os.Getenv("SCRAPER_PAGES")
+
+	fmt.Println("url", url)
+	fmt.Println("pages", pagesStr)
 
 	pages, err := strconv.Atoi(pagesStr)
 	if err != nil {
 		fmt.Println("Erro ao converter SCRAPER_PAGES para int:", err)
 		return
 	}
+
 
 	go h.cardScraper.ScrapeCards(url, pages)
 	c.JSON(http.StatusOK, gin.H{"message": "Scraping started"})
@@ -86,6 +103,6 @@ func (h *Handler) ValidateCard(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
 		"number": number,
-		"valid": isValid,
+		"valid":  isValid,
 	})
 }

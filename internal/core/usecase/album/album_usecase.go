@@ -1,4 +1,4 @@
-package usecase
+package album
 
 import (
 	"github.com/miguelnatantomaz/card-validator-go-rest/internal/core/domain"
